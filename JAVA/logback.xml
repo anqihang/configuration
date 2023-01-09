@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <!--    配置集中管理属性-->
+    <property name="pattern" value="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c %M %L [%thread] %m%n"/>
+    <!--    日志路径-->
+    <property name="log_dir" value="/logs"/>
+
+    <!--    控制台输出appender-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <target>$System.err</target>
+        <!--        消息格式-->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!--    输出文件配置-->
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <!--        保存的路径-->
+        <file>${log_dir}</file>
+        <!--        消息格式-->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!--    html日志格式文件输出-->
+    <appender name="htmlFile" class="ch.qos.logback.FileAppender">
+        <file>${log_dir}/logback.html</file>
+        <encoder class="ch.qos.logback.classic.html.HTMLLayout">
+            <pattern>%-5level%d{yyyy-MM-dd HH:mm:ss.SSS}%c%M%L%thread%m</pattern>
+        </encoder>
+    </appender>
+
+    <!--    日志拆分和归档压缩-->
+    <appender name="rollFile" class="ch.qos.logback.core.rolling.RollingFieAppender">
+        <file>${log_dir}/roll_logback.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%{pattern}</pattern>
+        </encoder>
+        <!--        拆分规则-->
+        <rollingPolicy class="ch.qos.logback.rolling.SizeAndTmeBasedRollingPolicy">
+            <!--            按照时间和压缩大小声明-->
+            <fileNamePatern>%{log_dir}/rolling.%d{yyyy-MM-dd HH-mm-ss}.log%i.gz</fileNamePatern>
+            <maxFileSize>1MB</maxFileSize>
+        </rollingPolicy>
+
+        <!--        日志级别过滤器-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <!--            过滤-->
+            <onMatch>ACCEPT</onMatch>
+            <!--            放行-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--    异步日志-->
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+        <!--        指定appender对象-->
+        <appender-ref ref="rollFile"/>
+    </appender>
+
+    <!--    logger的root配置-->
+    <root level="ALL">
+        <!--        控制台输出-->
+        <appender-ref ref="console"/>
+        <!--        <appender-ref ref="htmlFile" />-->
+        <!--        <appender-ref ref="rollFile" />-->
+        <!--        <appender-ref ref="async" />-->
+    </root>
+
+    <!--    自定义logger #additivity表示是否继承root的规则-->
+    <logger name="org.example level=info" additivity="false">
+        <appender-ref ref="console"/>
+    </logger>
+</configuration>
